@@ -46,7 +46,7 @@ ThemeData buildMuwajjehTheme() {
         fontWeight: FontWeight.w800,
       ),
     ),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: MuwajjehPalette.surface,
       elevation: 0,
       margin: const EdgeInsets.symmetric(vertical: 6),
