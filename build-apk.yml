@@ -1,0 +1,60 @@
+name: Build Muwajjeh APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Flutter version
+        run: flutter --version
+
+      - name: Generate Android platform safely
+        run: |
+          rm -rf /tmp/muwajjeh_android
+          flutter create --platforms=android --org com.muwajjeh --project-name muwajjeh_app /tmp/muwajjeh_android
+          rm -rf android
+          cp -R /tmp/muwajjeh_android/android ./android
+
+      - name: Get packages
+        run: flutter pub get
+
+      - name: Analyze project
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings
+
+      - name: Build APK
+        run: flutter build apk --release
+
+      - name: Rename APK
+        run: cp build/app/outputs/flutter-apk/app-release.apk Muwajjeh-V14-Fixed.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Muwajjeh-V14-Fixed-APK
+          path: Muwajjeh-V14-Fixed.apk
+          retention-days: 30
